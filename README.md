@@ -1,6 +1,6 @@
-# Yet Another Validator's benchmarks and tests against other validators
+# Yet Another Validator's benchmarks and tests
 
-See [SladeThe/yav](https://github.com/SladeThe/yav).
+This repo benchmarks and tests [SladeThe/yav](https://github.com/SladeThe/yav) against other validators.
 
 ```
 goos: windows
