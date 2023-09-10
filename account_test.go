@@ -21,19 +21,19 @@ var (
 )
 
 type Size struct {
-	Width  uint16 `json:"width" validate:"required,min=32,max=512"`
-	Height uint16 `json:"height" validate:"required,gt=31,lte=512"`
+	Width  uint16 `validate:"required,min=32,max=512"`
+	Height uint16 `validate:"required,gt=31,lte=512"`
 }
 
 func (s Size) Validate() error {
 	return yav.Join(
 		yav.Chain(
-			"width", s.Width,
+			"Width", s.Width,
 			vnumber.Required[uint16],
 			vnumber.BetweenUint16(32, 512),
 		),
 		yav.Chain(
-			"height", s.Height,
+			"Height", s.Height,
 			vnumber.Required[uint16],
 			vnumber.GreaterThanUint16(31),
 			vnumber.LessThanOrEqualUint16(512),
@@ -60,45 +60,45 @@ func (s Size) OzzoValidate() error {
 }
 
 type Account struct {
-	ID string `json:"id" validate:"required,uuid"`
+	ID string `validate:"required,uuid"`
 
-	Login    string `json:"login" validate:"required,min=4,max=20,alphanum,lowercase"`
-	Password string `json:"password" validate:"required_with=Login,omitempty,min=8,max=32,contains_lower_alpha,contains_upper_alpha,contains_digit,contains_special_character,excludes_whitespace,text"`
+	Login    string `validate:"required,min=4,max=20,alphanum,lowercase"`
+	Password string `validate:"required_with=Login,omitempty,min=8,max=32,contains_lower_alpha,contains_upper_alpha,contains_digit,contains_special_character,excludes_whitespace,text"`
 
-	Email string `json:"email" validate:"required,min=6,max=100,email,lowercase"`
-	Phone string `json:"phone" validate:"required,min=8,max=16,e164"`
+	Email string `validate:"required,min=6,max=100,email,lowercase"`
+	Phone string `validate:"required,min=8,max=16,e164"`
 
-	Age     uint8           `json:"age" validate:"omitempty,gte=18,lt=120"`
-	Avatars map[Size][]byte `json:"avatars" validate:"omitempty,min=3,max=10,dive,keys,endkeys,required,min=1,max=1000000"`
+	Age     uint8           `validate:"omitempty,gte=18,lt=120"`
+	Avatars map[Size][]byte `validate:"omitempty,min=3,max=10,dive,keys,endkeys,required,min=1,max=1000000"`
 
-	Secret    string `json:"secret" validate:"required,eq=secure"`
-	PromoCode string `json:"promoCode" validate:"omitempty,oneof=BlackFriday2022 BlackFriday2023"`
+	Secret    string `validate:"required,eq=secure"`
+	PromoCode string `validate:"omitempty,oneof=BlackFriday2022 BlackFriday2023"`
 
-	FirstName string `json:"firstName" validate:"omitempty,min=2,max=30,alpha,starts_with_upper_alpha,ends_with_lower_alpha"`
-	LastName  string `json:"lastName" validate:"omitempty,min=2,max=30,alpha,starts_with_upper_alpha,ends_with_lower_alpha"`
+	FirstName string `validate:"omitempty,min=2,max=30,alpha,starts_with_upper_alpha,ends_with_lower_alpha"`
+	LastName  string `validate:"omitempty,min=2,max=30,alpha,starts_with_upper_alpha,ends_with_lower_alpha"`
 
-	DisplayName string `json:"displayName" validate:"required_without_all=FirstName LastName,omitempty,min=2,max=50,title,alpha,uppercase"`
+	DisplayName string `validate:"required_without_all=FirstName LastName,omitempty,min=2,max=50,title,alpha,uppercase"`
 
-	CreatedAt time.Time `json:"createdAt" validate:"required,ltefield=UpdatedAt"`
-	UpdatedAt time.Time `json:"updatedAt" validate:"required,gtefield=CreatedAt"`
+	CreatedAt time.Time `validate:"required,ltefield=UpdatedAt"`
+	UpdatedAt time.Time `validate:"required,gtefield=CreatedAt"`
 }
 
 func (a Account) Validate() error {
 	return yav.Join(
 		yav.Chain(
-			"id", a.ID,
+			"ID", a.ID,
 			vstring.Required,
 			vstring.UUID,
 		),
 		yav.Chain(
-			"login", a.Login,
+			"Login", a.Login,
 			vstring.Required,
 			vstring.Between(4, 20),
 			vstring.Alphanumeric,
 			vstring.Lowercase,
 		),
 		yav.Chain(
-			"password", a.Password,
+			"Password", a.Password,
 			vstring.RequiredWithAny().String(a.Login).Names("Login"),
 			vstring.Between(8, 32),
 			vstring.ContainsLowerAlpha,
@@ -109,26 +109,26 @@ func (a Account) Validate() error {
 			vstring.Text,
 		),
 		yav.Chain(
-			"email", a.Email,
+			"Email", a.Email,
 			vstring.Required,
 			vstring.Between(6, 100),
 			vstring.Email,
 			vstring.Lowercase,
 		),
 		yav.Chain(
-			"phone", a.Phone,
+			"Phone", a.Phone,
 			vstring.Required,
 			vstring.Between(8, 16),
 			vstring.E164,
 		),
 		yav.Chain(
-			"age", a.Age,
+			"Age", a.Age,
 			vnumber.OmitEmpty[uint8],
 			vnumber.GreaterThanOrEqualUint8(18),
 			vnumber.LessThanUint8(120),
 		),
 		yav.Chain(
-			"avatars", a.Avatars,
+			"Avatars", a.Avatars,
 			vmap.OmitEmpty[map[Size][]byte],
 			vmap.Between[map[Size][]byte](3, 10),
 			vmap.Keys[map[Size][]byte](
@@ -140,17 +140,17 @@ func (a Account) Validate() error {
 			),
 		),
 		yav.Chain(
-			"secret", a.Secret,
+			"Secret", a.Secret,
 			vstring.Required,
 			vstring.Equal("secure"),
 		),
 		yav.Chain(
-			"promoCode", a.PromoCode,
+			"PromoCode", a.PromoCode,
 			vstring.OmitEmpty,
 			vstring.OneOf("BlackFriday2022", "BlackFriday2023"),
 		),
 		yav.Chain(
-			"firstName", a.FirstName,
+			"FirstName", a.FirstName,
 			vstring.OmitEmpty,
 			vstring.Between(2, 30),
 			vstring.Alpha,
@@ -158,7 +158,7 @@ func (a Account) Validate() error {
 			vstring.EndsWithLowerAlpha,
 		),
 		yav.Chain(
-			"lastName", a.LastName,
+			"LastName", a.LastName,
 			vstring.OmitEmpty,
 			vstring.Between(2, 30),
 			vstring.Alpha,
@@ -166,7 +166,7 @@ func (a Account) Validate() error {
 			vstring.EndsWithLowerAlpha,
 		),
 		yav.Chain(
-			"displayName", a.DisplayName,
+			"DisplayName", a.DisplayName,
 			vstring.RequiredWithoutAll().String(a.FirstName).String(a.LastName).Names("FirstName LastName"),
 			vstring.Between(2, 50),
 			vstring.Title,
@@ -174,12 +174,12 @@ func (a Account) Validate() error {
 			vstring.Uppercase,
 		),
 		yav.Chain(
-			"createdAt", a.CreatedAt,
+			"CreatedAt", a.CreatedAt,
 			vtime.Required,
 			vtime.LessThanOrEqualNamed("UpdatedAt", a.UpdatedAt),
 		),
 		yav.Chain(
-			"updatedAt", a.UpdatedAt,
+			"UpdatedAt", a.UpdatedAt,
 			vtime.Required,
 			vtime.GreaterThanOrEqualNamed("CreatedAt", a.CreatedAt),
 		),

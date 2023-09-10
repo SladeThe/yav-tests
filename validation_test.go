@@ -5,12 +5,10 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/SladeThe/yav"
 )
 
 func TestValidate(t *testing.T) {
-	v := yav.NewPlayground()
+	v := NewPlayground()
 
 	test := func(account Account) func(t *testing.T) {
 		return func(t *testing.T) {

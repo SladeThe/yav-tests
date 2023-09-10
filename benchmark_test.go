@@ -2,8 +2,6 @@ package tests
 
 import (
 	"testing"
-
-	"github.com/SladeThe/yav"
 )
 
 func BenchmarkYAV(b *testing.B) {
@@ -35,7 +33,7 @@ func BenchmarkOzzo(b *testing.B) {
 }
 
 func BenchmarkPlayground(b *testing.B) {
-	v := yav.NewPlayground()
+	v := NewPlayground()
 	account := ValidAccount()
 
 	if err := v.Validate(account); err != nil {
@@ -70,7 +68,7 @@ func BenchmarkOzzoParallel(b *testing.B) {
 }
 
 func BenchmarkPlaygroundParallel(b *testing.B) {
-	v := yav.NewPlayground()
+	v := NewPlayground()
 	account := ValidAccount()
 
 	b.RunParallel(func(pb *testing.PB) {
