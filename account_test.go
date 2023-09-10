@@ -6,7 +6,6 @@ import (
 	"github.com/asaskevich/govalidator"
 	ozzo "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
-	"go.uber.org/multierr"
 
 	"github.com/SladeThe/yav"
 	"github.com/SladeThe/yav/vbytes"
@@ -27,7 +26,7 @@ type Size struct {
 }
 
 func (s Size) Validate() error {
-	return multierr.Combine(
+	return yav.Join(
 		yav.Chain(
 			"width", s.Width,
 			vnumber.Required[uint16],
@@ -85,7 +84,7 @@ type Account struct {
 }
 
 func (a Account) Validate() error {
-	return multierr.Combine(
+	return yav.Join(
 		yav.Chain(
 			"id", a.ID,
 			vstring.Required,
