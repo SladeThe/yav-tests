@@ -26,7 +26,7 @@ type Size struct {
 }
 
 func (s Size) Validate() error {
-	return yav.Join(
+	return yav.Join2(
 		yav.Chain(
 			"Width", s.Width,
 			vnumber.Required[uint16],
