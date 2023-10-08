@@ -109,10 +109,17 @@ func (p Playground) Validate(s any) error {
 }
 
 func (p Playground) mustRegisterContains() {
-	p.Validator.RegisterAlias(yav.CheckNameContainsAlpha, "containsany="+common.CharactersAlpha)
-	p.Validator.RegisterAlias(yav.CheckNameContainsLowerAlpha, "containsany="+common.CharactersLowerAlpha)
-	p.Validator.RegisterAlias(yav.CheckNameContainsUpperAlpha, "containsany="+common.CharactersUpperAlpha)
-	p.Validator.RegisterAlias(yav.CheckNameContainsDigit, "containsany="+common.CharactersDigit)
+	const (
+		lowerAlpha = "abcdefghijklmnopqrstuvwxyz"
+		upperAlpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		alpha      = lowerAlpha + upperAlpha
+		digit      = "0123456789"
+	)
+
+	p.Validator.RegisterAlias(yav.CheckNameContainsAlpha, "containsany="+alpha)
+	p.Validator.RegisterAlias(yav.CheckNameContainsLowerAlpha, "containsany="+lowerAlpha)
+	p.Validator.RegisterAlias(yav.CheckNameContainsUpperAlpha, "containsany="+upperAlpha)
+	p.Validator.RegisterAlias(yav.CheckNameContainsDigit, "containsany="+digit)
 
 	fn := func(fl validator.FieldLevel) bool {
 		s, ok := p.fieldAsString(fl)

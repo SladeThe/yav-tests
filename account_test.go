@@ -186,6 +186,113 @@ func (a Account) Validate() error {
 	)
 }
 
+var (
+	accountIDValidateFuncs = []yav.ValidateFunc[string]{
+		vstring.Required,
+		vstring.UUID,
+	}
+
+	accountLoginValidateFuncs = []yav.ValidateFunc[string]{
+		vstring.Required,
+		vstring.Between(4, 20),
+		vstring.Alphanumeric,
+		vstring.Lowercase,
+	}
+
+	accountEmailValidateFuncs = []yav.ValidateFunc[string]{
+		vstring.Required,
+		vstring.Between(6, 100),
+		vstring.Email,
+		vstring.Lowercase,
+	}
+
+	accountPhoneValidateFuncs = []yav.ValidateFunc[string]{
+		vstring.Required,
+		vstring.Between(8, 16),
+		vstring.E164,
+	}
+
+	accountAgeValidateFuncs = []yav.ValidateFunc[uint8]{
+		vnumber.OmitEmpty[uint8],
+		vnumber.GreaterThanOrEqualUint8(18),
+		vnumber.LessThanUint8(120),
+	}
+
+	accountAvatarsValidateFuncs = []yav.ValidateFunc[map[Size][]byte]{
+		vmap.OmitEmpty[map[Size][]byte],
+		vmap.Between[map[Size][]byte](3, 10),
+		vmap.Keys[map[Size][]byte](
+			yav.UnnamedValidate[Size],
+		),
+		vmap.Values[map[Size][]byte](
+			vbytes.Required,
+			vbytes.Between(1, 1000000),
+		),
+	}
+
+	accountSecretValidateFuncs = []yav.ValidateFunc[string]{
+		vstring.Required,
+		vstring.Equal("secure"),
+	}
+
+	accountPromoCodeValidateFuncs = []yav.ValidateFunc[string]{
+		vstring.OmitEmpty,
+		vstring.OneOf("BlackFriday2022", "BlackFriday2023"),
+	}
+
+	accountFirstOrLastNameValidateFuncs = []yav.ValidateFunc[string]{
+		vstring.OmitEmpty,
+		vstring.Between(2, 30),
+		vstring.Alpha,
+		vstring.StartsWithUpperAlpha,
+		vstring.EndsWithLowerAlpha,
+	}
+)
+
+func (a Account) ValidatePreAllocated() error {
+	return yav.Join(
+		yav.Chain("ID", a.ID, accountIDValidateFuncs...),
+		yav.Chain("Login", a.Login, accountLoginValidateFuncs...),
+		yav.Chain(
+			"Password", a.Password,
+			vstring.RequiredWithAny().String(a.Login).Names("Login"),
+			vstring.Between(8, 32),
+			vstring.ContainsLowerAlpha,
+			vstring.ContainsUpperAlpha,
+			vstring.ContainsDigit,
+			vstring.ContainsSpecialCharacter,
+			vstring.ExcludesWhitespace,
+			vstring.Text,
+		),
+		yav.Chain("Email", a.Email, accountEmailValidateFuncs...),
+		yav.Chain("Phone", a.Phone, accountPhoneValidateFuncs...),
+		yav.Chain("Age", a.Age, accountAgeValidateFuncs...),
+		yav.Chain("Avatars", a.Avatars, accountAvatarsValidateFuncs...),
+		yav.Chain("Secret", a.Secret, accountSecretValidateFuncs...),
+		yav.Chain("PromoCode", a.PromoCode, accountPromoCodeValidateFuncs...),
+		yav.Chain("FirstName", a.FirstName, accountFirstOrLastNameValidateFuncs...),
+		yav.Chain("LastName", a.LastName, accountFirstOrLastNameValidateFuncs...),
+		yav.Chain(
+			"DisplayName", a.DisplayName,
+			vstring.RequiredWithoutAll().String(a.FirstName).String(a.LastName).Names("FirstName LastName"),
+			vstring.Between(2, 50),
+			vstring.Title,
+			vstring.Alpha,
+			vstring.Uppercase,
+		),
+		yav.Chain(
+			"CreatedAt", a.CreatedAt,
+			vtime.Required,
+			vtime.LessThanOrEqualNamed("UpdatedAt", a.UpdatedAt),
+		),
+		yav.Chain(
+			"UpdatedAt", a.UpdatedAt,
+			vtime.Required,
+			vtime.GreaterThanOrEqualNamed("CreatedAt", a.CreatedAt),
+		),
+	)
+}
+
 func (a Account) OzzoValidate() error {
 	return ozzo.ValidateStruct(
 		&a,

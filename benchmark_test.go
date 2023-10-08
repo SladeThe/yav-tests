@@ -18,6 +18,20 @@ func BenchmarkYAV(b *testing.B) {
 	}
 }
 
+func BenchmarkPreAllocatedYAV(b *testing.B) {
+	account := ValidAccount()
+
+	if err := account.ValidatePreAllocated(); err != nil {
+		b.Fatalf("unexpected error: %v", err)
+	}
+
+	b.ReportAllocs()
+
+	for i := 0; i < b.N; i++ {
+		_ = account.ValidatePreAllocated()
+	}
+}
+
 func BenchmarkOzzo(b *testing.B) {
 	account := ValidAccount()
 
@@ -53,6 +67,16 @@ func BenchmarkYAVParallel(b *testing.B) {
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
 			_ = account.Validate()
+		}
+	})
+}
+
+func BenchmarkPreAllocatedYAVParallel(b *testing.B) {
+	account := ValidAccount()
+
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			_ = account.ValidatePreAllocated()
 		}
 	})
 }
